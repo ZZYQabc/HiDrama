@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.personal.zzyq.dao.DramaMapper">
+  <resultMap id="BaseResultMap" type="com.personal.zzyq.bean.Drama">
+    <id column="drama_id" jdbcType="INTEGER" property="dramaId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="type_id" jdbcType="INTEGER" property="typeId" />
+    <result column="drama_name" jdbcType="VARCHAR" property="dramaName" />
+    <result column="drama_watching" jdbcType="INTEGER" property="dramaWatching" />
+    <result column="drama_current" jdbcType="INTEGER" property="dramaCurrent" />
+    <result column="drama_current_add" jdbcType="VARCHAR" property="dramaCurrentAdd" />
+    <result column="drama_all" jdbcType="INTEGER" property="dramaAll" />
+  </resultMap>
+  <resultMap type="com.personal.zzyq.bean.Drama" id="WithTypeResultMap">
+  	<id column="drama_id" jdbcType="INTEGER" property="dramaId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="type_id" jdbcType="INTEGER" property="typeId" />
+    <result column="drama_name" jdbcType="VARCHAR" property="dramaName" />
+    <result column="drama_watching" jdbcType="INTEGER" property="dramaWatching" />
+    <result column="drama_current" jdbcType="INTEGER" property="dramaCurrent" />
+    <result column="drama_current_add" jdbcType="VARCHAR" property="dramaCurrentAdd" />
+    <result column="drama_all" jdbcType="INTEGER" property="dramaAll" />
+    <!-- 指定联合查询类型封装 -->
+    <association property="type" javaType="com.personal.zzyq.bean.Type">
+    	<id column="type_id" property="typeId"/>
+    	<result column="type_name" property="typeName"/>
+    </association>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    drama_id, user_id, type_id, drama_name, drama_watching, drama_current, drama_current_add, 
+    drama_all
+  </sql>
+  <sql id="WithType_Column_List">
+  	d.drama_id, d.user_id, d.type_id, d.drama_name, d.drama_watching, d.drama_current, d.drama_current_add, 
+    d.drama_all, t.type_name
+  </sql>
+  <!--     List<Drama> selectByExampleWithType(DramaExample example);
+    Drama selectByPrimaryKeyWithType(Integer dramaId); -->
+  <!-- 查询剧集带类型 -->
+  <select id="selectByExampleWithType" resultMap="WithTypeResultMap">
+  	select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="WithType_Column_List" />
+    FROM drama d
+	LEFT JOIN type t ON d.type_id=t.type_id 
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKeyWithType" resultMap="WithTypeResultMap">
+  	select 
+    <include refid="WithType_Column_List" />
+    FROM drama d
+	LEFT JOIN type t ON d.type_id=t.type_id 
+    where drama_id = #{dramaId,jdbcType=INTEGER}
+  </select>
+  <!-- 查询剧集不带类型 -->
+  <select id="selectByExample" parameterType="com.personal.zzyq.bean.DramaExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from drama
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from drama
+    where drama_id = #{dramaId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from drama
+    where drama_id = #{dramaId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.personal.zzyq.bean.DramaExample">
+    delete from drama
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.personal.zzyq.bean.Drama">
+    insert into drama (drama_id, user_id, type_id, 
+      drama_name, drama_watching, drama_current, 
+      drama_current_add, drama_all)
+    values (#{dramaId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{typeId,jdbcType=INTEGER}, 
+      #{dramaName,jdbcType=VARCHAR}, #{dramaWatching,jdbcType=INTEGER}, #{dramaCurrent,jdbcType=INTEGER}, 
+      #{dramaCurrentAdd,jdbcType=VARCHAR}, #{dramaAll,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.personal.zzyq.bean.Drama">
+    insert into drama
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="dramaId != null">
+        drama_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="typeId != null">
+        type_id,
+      </if>
+      <if test="dramaName != null">
+        drama_name,
+      </if>
+      <if test="dramaWatching != null">
+        drama_watching,
+      </if>
+      <if test="dramaCurrent != null">
+        drama_current,
+      </if>
+      <if test="dramaCurrentAdd != null">
+        drama_current_add,
+      </if>
+      <if test="dramaAll != null">
+        drama_all,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="dramaId != null">
+        #{dramaId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="typeId != null">
+        #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="dramaName != null">
+        #{dramaName,jdbcType=VARCHAR},
+      </if>
+      <if test="dramaWatching != null">
+        #{dramaWatching,jdbcType=INTEGER},
+      </if>
+      <if test="dramaCurrent != null">
+        #{dramaCurrent,jdbcType=INTEGER},
+      </if>
+      <if test="dramaCurrentAdd != null">
+        #{dramaCurrentAdd,jdbcType=VARCHAR},
+      </if>
+      <if test="dramaAll != null">
+        #{dramaAll,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.personal.zzyq.bean.DramaExample" resultType="java.lang.Long">
+    select count(*) from drama
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update drama
+    <set>
+      <if test="record.dramaId != null">
+        drama_id = #{record.dramaId,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=INTEGER},
+      </if>
+      <if test="record.typeId != null">
+        type_id = #{record.typeId,jdbcType=INTEGER},
+      </if>
+      <if test="record.dramaName != null">
+        drama_name = #{record.dramaName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dramaWatching != null">
+        drama_watching = #{record.dramaWatching,jdbcType=INTEGER},
+      </if>
+      <if test="record.dramaCurrent != null">
+        drama_current = #{record.dramaCurrent,jdbcType=INTEGER},
+      </if>
+      <if test="record.dramaCurrentAdd != null">
+        drama_current_add = #{record.dramaCurrentAdd,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dramaAll != null">
+        drama_all = #{record.dramaAll,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update drama
+    set drama_id = #{record.dramaId,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=INTEGER},
+      type_id = #{record.typeId,jdbcType=INTEGER},
+      drama_name = #{record.dramaName,jdbcType=VARCHAR},
+      drama_watching = #{record.dramaWatching,jdbcType=INTEGER},
+      drama_current = #{record.dramaCurrent,jdbcType=INTEGER},
+      drama_current_add = #{record.dramaCurrentAdd,jdbcType=VARCHAR},
+      drama_all = #{record.dramaAll,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.personal.zzyq.bean.Drama">
+    update drama
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="typeId != null">
+        type_id = #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="dramaName != null">
+        drama_name = #{dramaName,jdbcType=VARCHAR},
+      </if>
+      <if test="dramaWatching != null">
+        drama_watching = #{dramaWatching,jdbcType=INTEGER},
+      </if>
+      <if test="dramaCurrent != null">
+        drama_current = #{dramaCurrent,jdbcType=INTEGER},
+      </if>
+      <if test="dramaCurrentAdd != null">
+        drama_current_add = #{dramaCurrentAdd,jdbcType=VARCHAR},
+      </if>
+      <if test="dramaAll != null">
+        drama_all = #{dramaAll,jdbcType=INTEGER},
+      </if>
+    </set>
+    where drama_id = #{dramaId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.personal.zzyq.bean.Drama">
+    update drama
+    set user_id = #{userId,jdbcType=INTEGER},
+      type_id = #{typeId,jdbcType=INTEGER},
+      drama_name = #{dramaName,jdbcType=VARCHAR},
+      drama_watching = #{dramaWatching,jdbcType=INTEGER},
+      drama_current = #{dramaCurrent,jdbcType=INTEGER},
+      drama_current_add = #{dramaCurrentAdd,jdbcType=VARCHAR},
+      drama_all = #{dramaAll,jdbcType=INTEGER}
+    where drama_id = #{dramaId,jdbcType=INTEGER}
+  </update>
+</mapper>
